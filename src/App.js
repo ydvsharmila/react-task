@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from "react";
+import "./App.css";
+import Card from "./components/Card";
+import Detail from "./components/Detail";
+import Search from "./components/Search";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [detail, setDetail] = useState(null);
+    const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        await fetch("https://api.openbrewerydb.org/breweries")
+            .then((response) => response.json())
+            .then((receiveddata) => {
+                setData(receiveddata);
+                setFilteredData(receiveddata);
+            });
+    };
+
+    return (
+        <div className="App">
+            {detail && <Detail data={detail} setDetail={setDetail}/>}
+            {!detail && <div className="details">
+                <Search data={data} setFilteredData={setFilteredData}/>
+                <div className="cards">
+                    {filteredData.map(d => <Card key={d.id} data={d} setDetail={setDetail}/>)}
+                </div>
+            </div>}
+        </div>
+    );
 }
 
 export default App;
